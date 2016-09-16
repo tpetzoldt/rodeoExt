@@ -58,7 +58,6 @@ rodeoExt$set("public", "save",
 # Load the DLL (or shared object) of the model.
 rodeoExt$set("public", "dyn.load",
   function() {
-
     base::dyn.load(self$dllfile)
   }
 )
@@ -75,7 +74,7 @@ rodeoExt$set("public", "setDefaultPars",
   function() {
     pp <- as.numeric(self$getParsTable()$default)
     names(pp) <- self$getParsTable()$name
-    self$activePars <- pp
+    self$assignPars(pp)
   }
 )
 
@@ -84,7 +83,7 @@ rodeoExt$set("public", "setDefaultVars",
   function() {
     y0 <- as.numeric(self$getVarsTable()$default)
     names(y0) <- self$getVarsTable()$name
-    self$activeVars <- y0
+    self$assignVars(y0)
   }
 )
 
@@ -93,10 +92,10 @@ rodeoExt$set("public", "sim",
   function(times, ...) {
     self$out <-
       ode(
-        y = self$activeVars,
+        y = self$queryVars(),
         times = times,
         func = "derivs_wrapped",
-        parms = self$activePars,
+        parms = self$queryPars(),
         dllname = self$modname,
         initfunc = "initmod",
         nout = self$lenPros() * self$size(),
@@ -105,9 +104,40 @@ rodeoExt$set("public", "sim",
   }
 )
 
-rodeoExt$set("public", "getOut",
-  function() {
-    self$out
+## helper function
+stripDotSection <- function(x) {
+  sub("[.].*$", "", x)
+}
+
+rodeoExt$set("public", "queryOut",
+  function(section = TRUE) {
+    out <- self$out
+    if (! section) {
+      attr(out, "dimnames")[[2]] <- stripDotSection(attr(out, "dimnames")[[2]])
+    }
+    out
   }
 )
+
+rodeoExt$set("public", "queryPars",
+  function(asMatrix=FALSE, section=TRUE) {
+    p <- super$queryPars(asMatrix=asMatrix)
+    if (!(section | asMatrix)) {
+      names(p) <- stripDotSection(names(p))
+    }
+    p
+  }
+)
+
+rodeoExt$set("public", "queryVars",
+  function(asMatrix=FALSE, section=TRUE) {
+    v <- super$queryVars(asMatrix=asMatrix)
+    if (!(section | asMatrix)) {
+      names(v) <- stripDotSection(names(v))
+    }
+    v
+  }
+)
+
+
 
