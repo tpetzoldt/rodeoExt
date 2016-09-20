@@ -74,7 +74,7 @@ rodeoExt$set("public", "setDefaultPars",
   function() {
     pp <- as.numeric(self$getParsTable()$default)
     names(pp) <- self$getParsTable()$name
-    self$assignPars(pp)
+    self$setPars(pp)
   }
 )
 
@@ -83,7 +83,7 @@ rodeoExt$set("public", "setDefaultVars",
   function() {
     y0 <- as.numeric(self$getVarsTable()$default)
     names(y0) <- self$getVarsTable()$name
-    self$assignVars(y0)
+    self$setVars(y0)
   }
 )
 
@@ -92,10 +92,10 @@ rodeoExt$set("public", "sim",
   function(times, ...) {
     self$out <-
       ode(
-        y = self$queryVars(),
+        y = self$getVars(),
         times = times,
         func = "derivs_wrapped",
-        parms = self$queryPars(),
+        parms = self$getPars(),
         dllname = self$modname,
         initfunc = "initmod",
         nout = self$lenPros() * self$size(),
@@ -109,7 +109,7 @@ stripDotSection <- function(x) {
   sub("[.].*$", "", x)
 }
 
-rodeoExt$set("public", "queryOut",
+rodeoExt$set("public", "getOut",
   function(section = TRUE) {
     out <- self$out
     if (! section) {
@@ -119,9 +119,9 @@ rodeoExt$set("public", "queryOut",
   }
 )
 
-rodeoExt$set("public", "queryPars",
+rodeoExt$set("public", "getPars",
   function(asMatrix=FALSE, section=TRUE) {
-    p <- super$queryPars(asMatrix=asMatrix)
+    p <- super$getPars(asMatrix=asMatrix)
     if (!(section | asMatrix)) {
       names(p) <- stripDotSection(names(p))
     }
@@ -129,9 +129,9 @@ rodeoExt$set("public", "queryPars",
   }
 )
 
-rodeoExt$set("public", "queryVars",
+rodeoExt$set("public", "getVars",
   function(asMatrix=FALSE, section=TRUE) {
-    v <- super$queryVars(asMatrix=asMatrix)
+    v <- super$getVars(asMatrix=asMatrix)
     if (!(section | asMatrix)) {
       names(v) <- stripDotSection(names(v))
     }
