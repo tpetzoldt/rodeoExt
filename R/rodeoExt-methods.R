@@ -58,14 +58,22 @@ rodeoExt$set("public", "save",
 # Load the DLL (or shared object) of the model.
 rodeoExt$set("public", "dyn.load",
   function() {
-    base::dyn.load(self$dllfile)
+    ## thpe: improve compatibility between Unixes and Windows
+    ## (use .dll/.so of the target system, irrespective where it comes from)
+    dllfile <- self$dllfile
+    ext <- substr(.Platform$dynlib.ext, 2, nchar(.Platform$dynlib.ext))
+    dllfile <- sub("so$|dll$", ext, dllfile)
+    base::dyn.load(dllfile)
   }
 )
 
 # Unload the DLL (or shared object) of the model.
 rodeoExt$set("public", "dyn.unload",
   function() {
-    base::dyn.unload(self$dllfile)
+    dllfile <- self$dllfile
+    ext <- substr(.Platform$dynlib.ext, 2, nchar(.Platform$dynlib.ext))
+    dllfile <- sub("so$|dll$", ext, dllfile)
+    base::dyn.unload(dllfile)
   }
 )
 
