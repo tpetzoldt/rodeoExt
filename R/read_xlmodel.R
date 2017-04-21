@@ -20,6 +20,9 @@ read_xlmodel <- function (xlfile,
   ## remove rows for which identifier (=1st column) contains NA
   tables <- lapply(tables, function(sheet) sheet[!is.na(sheet[,1]), ])
 
+  ## convert from read_xl specific "tibble" class to data.frame
+  tables <- lapply(tables, as.data.frame)
+
   names(tables) <- sheets
 
   ## reformat stoichiometry as cross table

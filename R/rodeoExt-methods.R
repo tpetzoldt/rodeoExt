@@ -27,8 +27,8 @@
 # Compile Fortran library for use with numerical methods from packages
 # \\code{\\link[deSolve]{deSolve}} or \\code{\\link[rootSolve]{rootSolve}}.
 rodeoExt$set("public", "compile", function() {
-  path <- paste(self$folder, self$sources, sep = "/")
-  self$lib <- super$compile(fileFun=path)
+  src <- paste(self$folder, self$sources, sep = "/")
+  self$lib <- super$compile(sources = src)
 })
 
 # Save model objecs as .rda file and corresponding .dll /. so
@@ -128,9 +128,9 @@ rodeoExt$set("public", "getOut",
 )
 
 rodeoExt$set("public", "getPars",
-  function(asMatrix=FALSE, section=TRUE) {
-    p <- super$getPars(asMatrix=asMatrix)
-    if (!(section | asMatrix)) {
+  function(asArray=FALSE, section=TRUE) {
+    p <- super$getPars(asArray=asArray)
+    if (!(section | asArray)) {
       names(p) <- stripDotSection(names(p))
     }
     p
@@ -138,9 +138,9 @@ rodeoExt$set("public", "getPars",
 )
 
 rodeoExt$set("public", "getVars",
-  function(asMatrix=FALSE, section=TRUE) {
-    v <- super$getVars(asMatrix=asMatrix)
-    if (!(section | asMatrix)) {
+  function(asArray=FALSE, section=TRUE) {
+    v <- super$getVars(asArray=asArray)
+    if (!(section | asArray)) {
       names(v) <- stripDotSection(names(v))
     }
     v
