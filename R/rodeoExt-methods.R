@@ -97,18 +97,20 @@ rodeoExt$set("public", "setDefaultVars",
 
 # Simulate the model with function \\code{\\link{ode()}}.
 rodeoExt$set("public", "sim",
-  function(times, ...) {
+  function(times, fortran=TRUE, proNames=TRUE, ...) {
     self$out <-
-      ode(
-        y = self$getVars(),
-        times = times,
-        func = "derivs_wrapped",
-        parms = self$getPars(),
-        dllname = self$modname,
-        initfunc = "initmod",
-        nout = self$lenPros() * self$size(),
-        ...
-      )
+      self$dynamics(times=times, fortran=fortran, proNames=proNames, ...)
+      ## alternative: direct call to ode
+      #self$out <- ode(
+      #  y = self$getVars(),
+      #  times = times,
+      #  func = "derivs_wrapped",
+      #  parms = self$getPars(),
+      #  dllname = self$modname,
+      #  initfunc = "initmod",
+      #  nout = self$lenPros() * self$size(),
+      #  ...
+      #)
   }
 )
 
