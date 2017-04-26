@@ -27,7 +27,7 @@ rodeoExt <- R6Class("rodeoExt",
                       modname = NULL,    # basename of .dll/.so and .rda files (without extension)
                       sources = NULL,    # additional Fortran 95 source files
                       dllfile = NULL,    # full name of .dll/.so with extension
-                      lib = NULL,        # vector of files returned by compile
+                      #lib = NULL,        # vector of files returned by compile
                       grid = NULL,       # grid; empty for 0D models, then nbox is set to 1
                       #activeVars = NULL, # initial values
                       #activePars = NULL, # parameter values that are set "active"
