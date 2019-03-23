@@ -27,8 +27,8 @@
 # Compile Fortran library for use with numerical methods from packages
 # \\code{\\link[deSolve]{deSolve}} or \\code{\\link[rootSolve]{rootSolve}}.
 rodeoExt$set("public", "compile", function() {
-  path <- paste(self$folder, self$sources, sep = "/")
-  self$lib <- super$compile(fileFun=path)
+  src <- paste(self$folder, self$sources, sep = "/")
+  super$compile(sources = src)
 })
 
 # Save model objecs as .rda file and corresponding .dll /. so
@@ -46,7 +46,8 @@ rodeoExt$set("public", "save",
                }
                if (dll) {
                  if (!file.exists(self$dllfile) | overwrite) {
-                   file.copy(self$lib["libFile"], self$dllfile, overwrite = overwrite)
+                   folder <- paste0(gsub("[\\]", "/", tempdir()), "/")
+                   file.copy(paste0(folder, model$libName(), .Platform$dynlib.ext), model$dllfile, overwrite = TRUE)
                  } else {
                    warning(self$dllfile, " exists and is not overwritten")
                  }
@@ -97,18 +98,35 @@ rodeoExt$set("public", "setDefaultVars",
 
 # Simulate the model with function \\code{\\link{ode()}}.
 rodeoExt$set("public", "sim",
-  function(times, ...) {
-    self$out <-
-      ode(
-        y = self$getVars(),
-        times = times,
-        func = "derivs_wrapped",
-        parms = self$getPars(),
-        dllname = self$modname,
-        initfunc = "initmod",
-        nout = self$lenPros() * self$size(),
-        ...
+  function(times, fortran=TRUE, proNames=TRUE, useRodeoDynamics=FALSE, ...) {
+    if (useRodeoDynamics) {
+      self$out <- self$dynamics(times=times, fortran=fortran, proNames=proNames, ...)
+    } else {
+      ## alternative: direct call to ode
+      #cat("size=", self$lenPros()*prod(self$getDim()), "\n")
+
+      #self$out <- deSolve::ode(
+      #  y       = self$getVars(),
+      #  times   = times,
+      #  func    = self$libFunc(),
+      #  parms   = self$getPars(),
+      #  dllname = self$modname, # todo: make it a function
+      #  #initfunc = "initmod", # now same as dllname (default)
+      #  nout    = self$lenPros()*prod(self$getDim()),
+      #  ...
+      #)
+      self$out <- deSolve::ode(y=self$getVars(),
+                          parms=self$getPars(),
+                          times=times,
+                          func=self$libFunc(),
+                          #dllname=self$libName(),
+                          dllname = self$modname,
+                          initfunc = self$libName(), # !! fix this
+                          nout=self$lenPros()*prod(self$getDim()),
+                          #outnames=if (proNames) elNames(self$namesPros(),self$getDim()) else NULL,
+                          ...
       )
+    }
   }
 )
 
@@ -128,9 +146,9 @@ rodeoExt$set("public", "getOut",
 )
 
 rodeoExt$set("public", "getPars",
-  function(asMatrix=FALSE, section=TRUE) {
-    p <- super$getPars(asMatrix=asMatrix)
-    if (!(section | asMatrix)) {
+  function(asArray=FALSE, section=TRUE) {
+    p <- super$getPars(asArray=asArray)
+    if (!(section | asArray)) {
       names(p) <- stripDotSection(names(p))
     }
     p
@@ -138,9 +156,9 @@ rodeoExt$set("public", "getPars",
 )
 
 rodeoExt$set("public", "getVars",
-  function(asMatrix=FALSE, section=TRUE) {
-    v <- super$getVars(asMatrix=asMatrix)
-    if (!(section | asMatrix)) {
+  function(asArray=FALSE, section=TRUE) {
+    v <- super$getVars(asArray=asArray)
+    if (!(section | asArray)) {
       names(v) <- stripDotSection(names(v))
     }
     v

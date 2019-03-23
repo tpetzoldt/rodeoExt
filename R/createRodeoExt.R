@@ -22,6 +22,8 @@ createRodeoExt <- function(folder, modfile, forcings, sources, modname) {
                          type="Excel",
                          sheets = c("vars", "pars", "funs", "pros", "stoi"))
 
+  tables <- lapply(tables, as.data.frame)
+
   model <- with(tables,
     rodeoExt$new(vars=vars, pars=pars, funs=funs, pros=pros, stoi=stoi))
 

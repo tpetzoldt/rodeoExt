@@ -19,13 +19,13 @@
 #' for the code generator package.
 #'
 #' @seealso package \code{\link[deSolve:deSolve-package]{deSolve}}
-#' for the numerical differential equation solverS.
+#' for the numerical differential equation solvers.
 #'
 #'
 #' @references
 #'
-#' Kneis, D. (2016). rodeo: A Code Generator for ODE-Based Models.
-#' R package version 0.3.1.
+#' Kneis, D. (2017). rodeo: A Code Generator for ODE-Based Models.
+#' R package version 0.7.1.
 #'
 #' Soetaert, K. and Petzoldt, T. 2010. Inverse Modelling, Sensitivity
 #' and Monte Carlo Analysis in R Using Package FME.  Journal of
